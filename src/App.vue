@@ -121,6 +121,7 @@ function send() {
 
 <style scoped>
 header{
+  background: white;
   user-select: none;
 }
 .cart{
