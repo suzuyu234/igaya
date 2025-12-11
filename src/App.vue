@@ -1,0 +1,218 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import logoImg from './assets/gohanyasan.png'
+import ramenImg from './assets/ramen.png'
+import yakitoriImg from './assets/yakitori.png'
+import waterImg from './assets/water.png'
+import teaImg from './assets/tea.png'
+
+// 型
+type Item = { name: string; price: number; img: string }
+type CartItem = { item: Item; qty: number }
+
+
+// カート
+const cart = ref<CartItem[]>([])
+const total = ref(0)
+
+const foodhyouji = ref(false)
+const drinkhyouji = ref(false)
+
+// 商品リスト
+const foodItems: Item[] = [
+  { name: "ラーメン", price: 500, img: ramenImg, },
+  { name: "焼き鳥", price: 300, img: yakitoriImg }
+]
+
+const drinkItems: Item[] = [
+  { name: "水", price: 100, img: waterImg },
+  { name: "お茶", price: 200, img: teaImg }
+]
+
+// カートに入れる関数
+function inCart(item: Item) {
+  const existing = cart.value.find(c => c.item.name === item.name)
+  if (existing) {
+    existing.qty++
+  } else {
+    cart.value.push({ item, qty: 1 })
+  }
+  total.value += item.price
+}
+
+function add(c: CartItem) {
+  c.qty++
+  total.value += c.item.price
+}
+
+function remove(c: CartItem) {
+  c.qty--
+  total.value -= c.item.price
+  if (c.qty <= 0) {
+    cart.value = cart.value.filter(x => x !== c)
+  }
+}
+// カートクリア
+function clear() {
+  cart.value = []
+  total.value = 0
+}
+
+// ボタン操作
+const foodkaihou = () => foodhyouji.value = !foodhyouji.value
+const drinkkaihou = () => drinkhyouji.value = !drinkhyouji.value
+
+// 注文送信
+function send() {
+  console.log("注文完了:", cart.value)
+  cart.value = []
+  total.value = 0
+}
+</script>
+
+<template>
+  <header>
+    <img src="./assets/gohanyasan.png" alt="ごはんやさん" class = "logo" />
+
+    <button @click="clear" class = "button003">カートの中身を消す</button>
+    <button @click="foodkaihou" class = "button003">ご飯類</button>
+    <button @click="drinkkaihou" class = "button003">飲み物</button>
+
+    <!-- ご飯 -->
+    <div v-if="foodhyouji">
+      <div 
+        v-for="item in foodItems" 
+        :key="item.name" 
+        class="item"
+      >
+        <img :src="item.img" class="item-img" />
+        <p>{{ item.name }} - {{ item.price }}円</p>
+        <button @click="inCart(item)" class="button008">カートに入れる</button>
+      </div>
+    </div>
+
+    <!-- 飲み物 -->
+    <div v-if="drinkhyouji">
+      <div
+        v-for="item in drinkItems"
+        :key="item.name"
+        class="item"
+      >
+        <img :src="item.img" class="item-img" />
+        <p>{{ item.name }} - {{ item.price }}円</p>
+        <button @click="inCart(item)" class="button008">カートに入れる</button>
+      </div>
+    </div>
+
+    <h2 class="cart">カート</h2>
+
+    <div v-for="c in cart" :key="c.item.name">
+      <img :src="c.item.img" class="item-img" />
+      {{ c.item.name }} ×{{ c.qty }}（{{ c.item.price }}円）
+      <button @click="add(c)">＋</button>
+      <button @click="remove(c)">ー</button>
+    </div>
+
+    <h3 class="sum">合計: {{ total }}円</h3>
+
+    <button @click="send" class="order">注文</button>
+  </header>
+</template>
+
+<style scoped>
+header{
+  user-select: none;
+}
+.cart{
+  font-family: fantasy;
+}
+.sum{
+  font-family: fantasy;
+}
+.logo{
+  display: block;       /* ブロック要素化 */
+  margin: 0 auto;       /* 左右マージン自動 */
+  width: 300px;
+}
+.item {
+  font-size: 20px;
+  font-weight: 900;
+  text-align: center;
+  margin: 10px 0;
+}
+.item-img {
+  width: 40px;
+}
+.order {
+  background: #eee;
+  display: flex;
+  position: relative;
+  justify-content: space-around;
+  max-width: 240px;
+  align-items: center;
+  padding: 10px 25px;
+  color: #313131;
+  transition: 0.3s ease-in-out;
+  font-weight: 500;
+  z-index:0;
+}
+.order:hover {
+    background: #313131;
+    color: #FFF;
+}
+
+.button008 {
+    background: #eee;
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 auto; /* 真ん中に設置　*/ 
+    max-width: 240px;
+    padding: 10px 25px;
+    color: #313131;
+    transition: 0.3s ease-in-out;
+    font-weight: 500;
+    z-index:0;
+}
+.button008:hover {
+    background: #313131;
+    color: #FFF;
+}
+
+
+.button003 {
+    background: #eee;
+    border-radius: 50px;
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 260px;
+    padding: 10px 25px;
+    color: #313131;
+    transition: 0.3s ease-in-out;
+    font-weight: 500;
+}
+.button003:hover {
+    background: #313131;
+    color: #FFF;
+}
+.button003:after {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-top: 3px solid #313131;
+    border-right: 3px solid #313131;
+    transform: rotate(45deg) translateY(-50%);
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    border-radius: 1px;
+    transition: 0.3s ease-in-out;
+}
+.button003 a:hover:after {
+    border-color: #FFF;
+}
+</style>
