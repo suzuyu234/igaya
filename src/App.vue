@@ -121,6 +121,7 @@ function send() {
 
 <style scoped>
 header{
+  color: #000; 
   background: white;
   user-select: none;
 }
@@ -139,6 +140,7 @@ header{
   font-size: 20px;
   font-weight: 900;
   text-align: center;
+  color:black;
   margin: 10px 0;
 }
 .item-img {
